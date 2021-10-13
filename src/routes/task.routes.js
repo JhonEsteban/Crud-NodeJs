@@ -1,81 +1,27 @@
 const express = require('express');
 const router = express.Router();
 
-const { ObjectId } = require('mongodb');
-const connectToMongodb = require('../database');
+const {
+  getAllTasks,
+  getOneTask,
+  createNewTask,
+  updateTaskById,
+  deleteTaskById,
+} = require('../controllers/tasks.controller');
 
 // GET ALL
-router.get('/', async (req, res) => {
-  const db = await connectToMongodb();
-
-  const result = await db.collection('tasks').find({}).toArray();
-
-  res.json({
-    data: result,
-  });
-});
+router.get('/', getAllTasks);
 
 // GET ONE
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  const db = await connectToMongodb();
-
-  const result = await db.collection('tasks').findOne({ _id: ObjectId(id) });
-
-  res.json({
-    data: result,
-  });
-});
+router.get('/:id', getOneTask);
 
 // CREATE
-router.post('/', async (req, res) => {
-  const db = await connectToMongodb();
-
-  const { name, description, done } = req.body;
-
-  const result = await db
-    .collection('tasks')
-    .insertOne({ name, description, done });
-
-  res.json({
-    result,
-    success: true,
-    message: 'La tarea se añadio con exito',
-  });
-});
+router.post('/', createNewTask);
 
 // UPDATE
-router.put('/:id', async (req, res) => {
-  const { id } = req.params;
-  const { name, description, done } = req.body;
-
-  const db = await connectToMongodb();
-
-  const result = await db
-    .collection('tasks')
-    .updateOne({ _id: ObjectId(id) }, { $set: { name, description, done } });
-
-  res.json({
-    result,
-    success: true,
-    message: `La tarea con el id ${id} se actualizo con exito`,
-  });
-});
+router.put('/:id', updateTaskById);
 
 // DELETE
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  const db = await connectToMongodb();
-
-  const result = await db.collection('tasks').deleteOne({ _id: ObjectId(id) });
-
-  res.json({
-    result,
-    success: true,
-    message: `La tarea con el id ${id} se elimino con exito`,
-  });
-});
+router.delete('/:id', deleteTaskById);
 
 module.exports = router;
